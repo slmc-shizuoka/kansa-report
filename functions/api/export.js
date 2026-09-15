@@ -2,10 +2,15 @@ import { buildExport } from "../_shared/report.js";
 
 const XLSX_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-export async function onRequestPost({ request }) {
+export async function onRequestPost({ request, env }) {
   try {
     const payload = await request.json();
-    const templateResponse = await fetch(new URL("/template/report-template.xlsx", request.url));
+    const templateRequest = new Request(new URL("/template/report-template.xlsx", request.url), {
+      method: "GET"
+    });
+    const templateResponse = env?.ASSETS
+      ? await env.ASSETS.fetch(templateRequest)
+      : await fetch(templateRequest);
     if (!templateResponse.ok) throw new Error("Excelテンプレートを読み込めませんでした。");
 
     const file = await buildExport(payload, await templateResponse.arrayBuffer());
