@@ -1,0 +1,14 @@
+{
+  "name": "planner-report-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.cjs",
+    "check": "node --check public/app.js && node --check public/pdf-import.js && node --check server.cjs && node --check functions/api/meta.js && node --check functions/api/export.js && node --check functions/_shared/report.js"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "pdfjs-dist": "^6.3.289"
+  }
+}

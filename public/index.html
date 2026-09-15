@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>監査不適合改善報告 入力</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <p class="eyebrow">202608 更新</p>
+          <h1>監査不適合改善報告</h1>
+        </div>
+
+        <div class="sidebar-actions">
+          <button id="newPlanner" class="primary">＋ プランナー</button>
+          <button id="exportXlsx" class="accent">↓ .xlsx</button>
+        </div>
+        <button id="importReport" class="ghost wide" type="button">監査結果インポート</button>
+        <input id="importFile" type="file" accept=".pdf,.xlsx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+
+        <section class="planner-log" aria-label="データログ">
+          <div class="section-title">
+            <span>データログ</span>
+            <strong id="selectedCount">0</strong>
+          </div>
+          <div id="plannerList" class="planner-list"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="stepper" aria-label="入力ステップ">
+            <span id="stepOne" class="step is-active">1 プランナー</span>
+            <span id="stepTwo" class="step">2 項目入力</span>
+          </div>
+          <div class="utility-actions">
+            <button id="openSettings" class="ghost">設定</button>
+            <button id="openSnippets" class="ghost">定型文</button>
+            <button id="copyData" class="ghost">全体コピー</button>
+            <button id="togglePaste" class="ghost">全体貼り付け</button>
+            <button id="savePlanner" class="primary">保存</button>
+          </div>
+        </header>
+
+        <nav class="view-tabs" aria-label="表示切替">
+          <button id="showInputTab" class="view-tab is-active" type="button" aria-selected="true">入力</button>
+          <button id="showFormatTab" class="view-tab" type="button" aria-selected="false">フォーマット</button>
+        </nav>
+
+        <section id="pasteTray" class="paste-tray" hidden>
+          <textarea id="pasteBox" spellcheck="false" placeholder="JSON または TSV"></textarea>
+          <div class="tray-actions">
+            <button id="applyPaste" class="primary">反映</button>
+            <button id="clearPaste" class="ghost">クリア</button>
+          </div>
+        </section>
+
+        <section id="inputView" class="tab-panel is-active">
+          <div class="entry-layout">
+          <div class="entry-pane">
+            <section id="plannerStep" class="planner-step">
+              <label class="field-label" for="plannerName">対象プランナー</label>
+              <input id="plannerName" class="name-input" type="text" autocomplete="off" placeholder="氏名">
+              <button id="continueInput" class="primary wide">項目入力へ</button>
+            </section>
+
+            <section id="detailStep" class="detail-step" hidden>
+              <div class="settings-summary">
+                <div>
+                  <span>地区</span>
+                  <strong id="summaryDistrict">未設定</strong>
+                </div>
+                <div>
+                  <span>BASE</span>
+                  <strong id="summaryBase">未設定</strong>
+                </div>
+                <div>
+                  <span>監査委員</span>
+                  <strong id="summaryAuditor">未設定</strong>
+                </div>
+                <button id="editSettingsInline" class="ghost" type="button">設定変更</button>
+              </div>
+
+              <div id="itemList" class="item-list"></div>
+            </section>
+          </div>
+          </div>
+        </section>
+
+        <section id="formatView" class="tab-panel" hidden>
+          <aside class="preview-pane format-pane">
+            <div class="preview-head">
+              <span>フォーマット反映</span>
+              <div class="preview-actions">
+                <span id="formatStatus">未反映</span>
+                <button id="applyFormat" class="primary" type="button">反映</button>
+                <a href="/assets/template-preview.png" target="_blank" rel="noreferrer">元フォーマット</a>
+              </div>
+            </div>
+            <div id="formatPreview" class="format-preview">
+              <div class="format-empty">
+                <strong>反映ボタンを押すと、入力内容がここに表示されます</strong>
+                <span>エクスポート前の確認に使えます</span>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="settingsDialog" class="settings-dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">REPORT SETTINGS</p>
+          <h2>基本設定</h2>
+        </div>
+        <button id="closeSettings" class="icon-button" type="button" title="閉じる" aria-label="基本設定を閉じる">×</button>
+      </div>
+
+      <section class="settings-form" aria-label="基本設定">
+        <label>地区<input id="district" type="text" placeholder="例：静岡地区"></label>
+        <label>BASE<input id="base" type="text" placeholder="例：静岡BASE"></label>
+        <label>監査委員<input id="auditor" type="text" placeholder="例：監査委員 佐藤"></label>
+        <label>更新表記<input id="version" type="text" placeholder="例：202608更新"></label>
+        <div class="dialog-actions">
+          <button id="resetSettings" class="ghost" type="button">初期値に戻す</button>
+          <button id="saveSettings" class="primary" type="button">設定を保存</button>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog id="snippetDialog" class="snippet-dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">PHRASE LIBRARY</p>
+          <h2>定型文</h2>
+        </div>
+        <button id="closeSnippets" class="icon-button" type="button" title="閉じる" aria-label="定型文を閉じる">×</button>
+      </div>
+
+      <div class="snippet-layout">
+        <section class="snippet-form" aria-label="定型文の登録">
+          <label>定型文名<input id="snippetName" type="text" placeholder="例：原因確認済み"></label>
+          <label>使用する欄
+            <select id="snippetField">
+              <option value="all">すべての文章欄</option>
+              <option value="reason">不適合理由</option>
+              <option value="plan">地区改善計画・策</option>
+              <option value="feedback">フィードバック事項</option>
+            </select>
+          </label>
+          <label>本文<textarea id="snippetBody" rows="7" placeholder="繰り返し使う文章を入力"></textarea></label>
+          <button id="saveSnippet" class="primary" type="button">定型文を保存</button>
+        </section>
+
+        <section class="snippet-library" aria-label="保存済み定型文">
+          <div class="section-title">
+            <span>保存済み</span>
+            <strong id="snippetCount">0</strong>
+          </div>
+          <div id="snippetList" class="snippet-list"></div>
+        </section>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/vendor/jszip.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
